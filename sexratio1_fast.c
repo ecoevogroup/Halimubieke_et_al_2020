@@ -1,5 +1,5 @@
 /*****************************************************************************************************
- * [t,x] = sexratio1_fast(t_max,alphaM,alphaF,betaM,betaF,deltaM,deltaF,gammaM,gammaF,b,c,f_M,f_F,q,s)
+ * [t,x] = sexratio1_fast(t_max,alphaM,alphaF,betaM,betaF,dM,dF,gammaM,gammaF,b,c,f_M,f_F,q,r)
  *
  * Compile in Matlab using mex sexratio1_fast.c
  ****************************************************************************************************/
@@ -41,8 +41,8 @@ struct PARAM{
     double alphaF;
     double betaM;
     double betaF;
-    double deltaM;
-    double deltaF;
+    double dM;
+    double dF;
     double gammaM;
     double gammaF;
     double b;
@@ -50,7 +50,7 @@ struct PARAM{
     double f_M;
     double f_F;
     double q;
-    double s; 
+    double r; 
 };
 
 /*************************************
@@ -85,9 +85,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         parameter= mxGetPr(prhs[4]);
         p.betaF= *parameter;
         parameter= mxGetPr(prhs[5]);
-        p.deltaM= *parameter;
+        p.dM= *parameter;
         parameter= mxGetPr(prhs[6]);
-        p.deltaF= *parameter;
+        p.dF= *parameter;
         parameter= mxGetPr(prhs[7]);
         p.gammaM= *parameter;
         parameter= mxGetPr(prhs[8]);
@@ -103,7 +103,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         parameter= mxGetPr(prhs[13]);
         p.q= *parameter;
         parameter= mxGetPr(prhs[14]);
-        p.s= *parameter;
+        p.r= *parameter;
     }
     maxsteps = (int)MAXSTEPS;
     
@@ -154,10 +154,10 @@ int my_rungkut (double *T, double *xOut, struct PARAM *p){
     maxsteps = (int)MAXSTEPS;
     
     /* Initialise populations */
-    x[0] = p->s;
-    x[1] = 1-p->s;
-    x[2] = p->s/10;
-    x[3] = (1-p->s)/10;
+    x[0] = p->r;
+    x[1] = 1-p->r;
+    x[2] = p->r/10;
+    x[3] = (1-p->r)/10;
     
     /* Update output */
     T[0]=t;
@@ -311,10 +311,10 @@ void dynamic(double *x, double *dxdt, struct PARAM *p){
         
     births = p->b*(1-p->q*N)*(SMSF + p->f_F*SMIF + p->f_M*IMSF + p->f_M*p->f_F*IMIF);
     
-    dxdt[0] = births*p->s - p->deltaM*SM - p->betaM*SMIF + p->gammaM*IM;
-    dxdt[1] = births*(1-p->s) - p->deltaF*SF - p->betaF*IMSF + p->gammaF*IF;
-    dxdt[2] = p->betaM*SMIF - (p->alphaM + p->deltaM + p->gammaM)*IM;
-    dxdt[3] = p->betaF*IMSF - (p->alphaF + p->deltaF + p->gammaF)*IF;
+    dxdt[0] = births*p->r - p->dM*SM - p->betaM*SMIF + p->gammaM*IM;
+    dxdt[1] = births*(1-p->r) - p->dF*SF - p->betaF*IMSF + p->gammaF*IF;
+    dxdt[2] = p->betaM*SMIF - (p->alphaM + p->dM + p->gammaM)*IM;
+    dxdt[3] = p->betaF*IMSF - (p->alphaF + p->dF + p->gammaF)*IF;
 }
 
 /***************************************

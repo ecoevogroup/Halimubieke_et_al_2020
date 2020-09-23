@@ -10,11 +10,10 @@ alphaM = 0.3;
 alphaF = 0.3;
 betaM = 0.5;
 betaF = 0.5;
-s = linspace(0,1,101);
+r = linspace(0,1,101);
 betaMArray = linspace(0,1,501);
 alphaMArray = linspace(0,2,500);
-deltaM = 0.1;
-deltaF = deltaM;
+d = 0.1;
 gammaM = 0.2;
 gammaF = 0.2;
 b = 1;
@@ -35,11 +34,11 @@ disp('Generating figure 4');
 
 for i=1:length(betaMArray)
     for j = 1:length(alphaMArray)
-        males = zeros(1,length(s));
-        females = zeros(1,length(s));
-        overall = zeros(1,length(s));
-        parfor k = 1:length(s)
-            [~,x] = sexratio1_fast(t_max,alphaMArray(j),alphaF,betaMArray(i),betaF,deltaM,deltaF,gammaM,gammaF,b,c,f_M,f_F,q,s(k));
+        males = zeros(1,length(r));
+        females = zeros(1,length(r));
+        overall = zeros(1,length(r));
+        parfor k = 1:length(r)
+            [~,x] = sexratio1_fast(t_max,alphaMArray(j),alphaF,betaMArray(i),betaF,d,d,gammaM,gammaF,b,c,f_M,f_F,q,r(k));
             if(sum(x(end,3:4),2)>1e-6)
                 males(1,k) = x(end,3)/sum(x(end,[1,3]),2);
                 females(1,k) = x(end,4)/sum(x(end,[2,4]),2);
@@ -49,9 +48,9 @@ for i=1:length(betaMArray)
         males = smooth(males,10);
         females = smooth(females,10);
         overall = smooth(overall,10);
-        malespeak(i,j) = s(find(males==max(males),1));
-        femalespeak(i,j) = s(find(females==max(females),1));
-        overallpeak(i,j) = s(find(overall==max(overall),1));
+        malespeak(i,j) = r(find(males==max(males),1));
+        femalespeak(i,j) = r(find(females==max(females),1));
+        overallpeak(i,j) = r(find(overall==max(overall),1));
     end
     disp(strcat(num2str(i*100/length(betaMArray)),'% complete'));
 end
@@ -119,12 +118,12 @@ C = colorbar;
 Cpos = get(C,'position');
 Cpos(1) = temp(1)+temp(3)+0.02;
 set(C,'position',Cpos);
-y1=ylabel(C,{'Sex ratio at maturation where','disease prevalence peaks'},'interpreter','latex','fontsize',13);
+y1=ylabel(C,{'Sex ratio at birth where','disease prevalence peaks'},'interpreter','latex','fontsize',13);
 set(C,'ytick',mn:0.1:mx)
 
 load('cvidis.mat')
 colormap(cvidis);
 
-fig4=figure(4);
-fig4.Renderer='Painters';
+% fig4=figure(4);
+% fig4.Renderer='Painters';
 % save2pdf('fig4.pdf')

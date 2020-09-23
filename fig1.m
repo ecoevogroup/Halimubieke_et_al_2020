@@ -1,15 +1,18 @@
 % Fig 1
 
+
+t_max = 1000;
 alpha = 0.3;
 beta = 0.5;
 
 ALPHA = [0,0.4,0.8];
 BETA = [0.3,0.45,1];
 
-s = linspace(0,1,101);
+r = linspace(0,1,101);
 plotflag = 0;
 c = 5;
 d = 0.1;
+gamma = 0.2;
 sub = 0;
 
 labs = {'(a)','(b)','(c)','(d)'};
@@ -34,12 +37,13 @@ for i1=1:2
             betaF = BETA(j1);
         end
         
-        males=zeros(length(s),1);
-        females=zeros(length(s),1);
-        overall=zeros(length(s),1);
-        diff1=zeros(length(s),1);
-        for i=1:length(s)
-            [t,x] = sexratio1(alphaM,alphaF,betaM,betaF,s(i),plotflag);
+        males=zeros(length(r),1);
+        females=zeros(length(r),1);
+        overall=zeros(length(r),1);
+        diff1=zeros(length(r),1);
+        for i=1:length(r)
+            [t,x] = sexratio1(alphaM,alphaF,betaM,betaF,r(i),plotflag);
+%             [t,x] = sexratio1_fast(t_max,alphaM,alphaF,betaM,betaF,d,d,gamma,gamma,b,c,1,1,q,r(i));
             if(sum(x(end,3:4),2)>1e-6)
                 males(i,1) = x(end,3)/sum(x(end,[1,3]),2);
                 females(i,1) = x(end,4)/sum(x(end,[2,4]),2);
@@ -49,18 +53,18 @@ for i1=1:2
         end
         maxMP = max(males);
         maxFP = max(females);
-        peaks = [s(find(males==max(males),1)),s(find(females==max(females),1))];
+        peaks = [r(find(males==max(males),1)),r(find(females==max(females),1))];
         
         maxdiff1 = max(diff1);
         maxdiff2 = min(diff1);
-        diffpeaks = [s(find(diff1==max(diff1),1)),s(find(diff1==min(diff1),1))];
+        diffpeaks = [r(find(diff1==max(diff1),1)),r(find(diff1==min(diff1),1))];
         diff1 = abs(diff1);
         
         subplot(2,2,i1)
         hold on
-        plot(s,males,'k')
-        plot(s,females,'k--')
-        plot(s,overall,'k.','markersize',4)
+        plot(r,males,'k')
+        plot(r,females,'k--')
+        plot(r,overall,'k.','markersize',4)
         plot(peaks(1),maxMP,'ko','MarkerSize', 5,'markerfacecolor','k')
         plot(peaks(2),maxFP,'ko','MarkerSize', 5,'markerfacecolor','w')
         ylim([0 1])
@@ -90,7 +94,7 @@ for i1=1:2
         
         subplot(2,2,2+i1)
         hold on
-        plot(s,diff1,'k')
+        plot(r,diff1,'k')
         plot(diffpeaks(1),maxdiff1,'k*','MarkerSize', 5)
         plot(diffpeaks(2),abs(maxdiff2),'k*','MarkerSize', 5)
         ylim([0,0.5])
@@ -104,7 +108,7 @@ for i1=1:2
         set(gca,'ytick',0:0.1:0.5)
         if(i1==1)
             ylabel('$|D_M-D_F|$','interpreter','latex','fontsize',16)
-            x1=xlabel('sex ratio at maturation (proportion male), $s$','interpreter','latex','fontsize',16);
+            x1=xlabel('sex ratio at birth (proportion male), $r$','interpreter','latex','fontsize',16);
             temp = get(x1,'position');
             temp(1)=temp(1)+0.23;
             set(x1,'position',temp)
